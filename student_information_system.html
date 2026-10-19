@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StuDex - Student Management & Information System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        studex: {
+                            navy: '#0c2340',
+                            navyLight: '#183861',
+                            gold: '#f39c12',
+                            goldHover: '#d3820d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 font-sans antialiased flex flex-col">
+
+    <!-- Top Header Navigation -->
+    <header class="bg-studex-navy text-white shadow-md sticky top-0 z-30 border-b border-amber-500/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Rebranded Custom StuDex SVG Logo -->
+                <div class="bg-white p-1.5 rounded-xl flex items-center justify-center shadow-sm">
+                    <svg class="w-8 h-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Book pages left & right (Navy) -->
+                        <path d="M30 110 L95 135 L95 85 L30 60 Z" fill="#0c2340" />
+                        <path d="M95 135 L160 100 L160 50 L95 85 Z" fill="#0056b3" />
+                        <path d="M40 50 C 65 50, 85 62, 95 72 C 105 62, 125 50, 150 50 L 160 100 C 135 100, 105 118, 95 135 C 85 118, 55 100, 30 100 Z" fill="none" stroke="#0c2340" stroke-width="12" stroke-linejoin="round" />
+                        <!-- Bar chart elements (Gold/Navy) -->
+                        <rect x="98" y="45" width="10" height="35" rx="2" fill="#f39c12"/>
+                        <rect x="114" y="32" width="10" height="48" rx="2" fill="#0c2340"/>
+                        <rect x="130" y="22" width="10" height="58" rx="2" fill="#f39c12"/>
+                        <!-- Upward trend arrow (Gold) -->
+                        <path d="M60 105 C 80 85, 110 50, 160 25" stroke="#f39c12" stroke-width="12" stroke-linecap="round"/>
+                        <path d="M142 22 L168 22 L168 48 Z" fill="#f39c12" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400 block leading-tight">Student Information System</span>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-1">
+                        StuDex
+                    </h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold text-sm px-4 py-2 rounded-xl shadow-sm transition flex items-center space-x-2">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="hidden sm:inline">Add Student</span>
+                </button>
+                <div class="flex items-center space-x-3 border-l border-slate-700 pl-4">
+                    <img class="h-9 w-9 rounded-full object-cover ring-2 ring-amber-400" src="https://placehold.co/100x100/0c2340/ffffff?text=SD" alt="Admin" onerror="this.src='https://placehold.co/100x100/e2e8f0/64748b?text=Admin'">
+                    <div class="hidden md:block text-left">
+                        <p class="text-sm font-semibold leading-none text-white">Registrar Admin</p>
+                        <p class="text-xs text-amber-300 mt-1">admin@studex.edu</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-6">
+
+        <!-- Metrics / Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Enrolled</p>
+                    <p id="statTotal" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                </div>
+                <div class="bg-slate-100 text-studex-navy p-3 rounded-xl">
+                    <i class="fa-solid fa-users text-lg"></i>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Computer Science</p>
+                    <p id="statCS" class="text-2xl font-bold text-slate-900 mt-1">0</p>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-laptop-code text-lg"></i>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Good Standing</p>
+                    <p id="statGood" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+                </div>
+                <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-circle-check text-lg"></i>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Average Load Units</p>
+                    <p id="statUnits" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                </div>
+                <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
+                    <i class="fa-solid fa-book-open text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="w-full md:w-96 relative">
+                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterStudents()" placeholder="Search by Student ID or Name..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+            </div>
+            
+            <div class="w-full md:w-auto flex flex-wrap gap-3 items-center">
+                <div class="flex-1 sm:flex-none">
+                    <select id="filterCourse" onchange="filterStudents()" class="w-full sm:w-48 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        <option value="">All Courses</option>
+                        <option value="BSc Computer Science">BSc Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Business Administration">Business Administration</option>
+                        <option value="Data Science">Data Science</option>
+                    </select>
+                </div>
+                <div class="flex-1 sm:flex-none">
+                    <select id="filterYear" onchange="filterStudents()" class="w-full sm:w-44 px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        <option value="">All Year Levels</option>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                    </select>
+                </div>
+                <button onclick="resetFilters()" class="px-4 py-2.5 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Data Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h2 class="font-bold text-slate-800 flex items-center space-x-2">
+                    <i class="fa-solid fa-address-card text-amber-500"></i>
+                    <span>StuDex Profiles</span>
+                </h2>
+                <span id="resultCount" class="text-xs font-semibold bg-amber-50 text-amber-800 px-2.5 py-1 rounded-full border border-amber-200">Showing 0 students</span>
+            </div>
+
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-6">Student ID</th>
+                            <th class="py-3.5 px-6">Name</th>
+                            <th class="py-3.5 px-6">Course</th>
+                            <th class="py-3.5 px-6">Year Level</th>
+                            <th class="py-3.5 px-6">Academic Status</th>
+                            <th class="py-3.5 px-6">Contact Info</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+                        <!-- Dynamic rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 px-4 text-center">
+                <div class="bg-amber-50 text-amber-500 w-16 h-16 rounded-full flex items-center justify-center text-2xl mb-4">
+                    <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <h3 class="text-base font-semibold text-slate-800">No student profiles found</h3>
+                <p class="text-sm text-slate-500 max-w-sm mt-1">Try adjusting your search query or filters, or create a new student entry in StuDex.</p>
+                <button onclick="openAddModal()" class="mt-4 bg-studex-navy text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-studex-navyLight transition">
+                    Add Student Profile
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="studentModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all my-8">
+            <div class="px-6 py-4 bg-studex-navy text-white flex items-center justify-between">
+                <h3 id="modalTitle" class="font-bold text-lg">Add New Student</h3>
+                <button onclick="closeModal()" class="text-slate-300 hover:text-white p-1 rounded-lg transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form id="studentForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editOriginalId">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Student ID *</label>
+                        <input type="text" id="formId" required placeholder="e.g. 12347" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Full Name *</label>
+                        <input type="text" id="formName" required placeholder="e.g. Sarah Jenkins" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Course *</label>
+                        <select id="formCourse" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                            <option value="">Select Course</option>
+                            <option value="BSc Computer Science">BSc Computer Science</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Business Administration">Business Administration</option>
+                            <option value="Data Science">Data Science</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Year Level *</label>
+                        <select id="formYear" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                            <option value="">Select Year Level</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Email Address *</label>
+                        <input type="email" id="formEmail" required placeholder="student@studex.edu" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Phone Number *</label>
+                        <input type="text" id="formPhone" required placeholder="555-0199" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Academic Status *</label>
+                        <select id="formStatus" required class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                            <option value="Good Standing">Good Standing</option>
+                            <option value="Dean's List">Dean's List</option>
+                            <option value="Academic Probation">Academic Probation</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">No. of Units *</label>
+                        <input type="number" id="formUnits" min="1" max="30" required value="18" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Subjects Enrolled (comma separated) *</label>
+                    <input type="text" id="formSubjects" required placeholder="CS301 - Data Structures, CS302 - Algorithms, IT303" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 text-sm font-semibold text-slate-900 bg-amber-500 hover:bg-amber-600 rounded-xl shadow-sm transition">
+                        Save Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Profile Details Modal -->
+    <div id="viewModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden transform transition-all my-8">
+            <div class="bg-studex-navy text-white p-6 relative">
+                <button onclick="closeViewModal()" class="absolute top-4 right-4 text-slate-300 hover:text-white p-1 rounded-lg transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div id="viewAvatar" class="h-16 w-16 rounded-2xl bg-amber-500 text-slate-900 flex items-center justify-center text-2xl font-bold ring-4 ring-amber-400/30">
+                        JD
+                    </div>
+                    <div>
+                        <span id="viewIdBadge" class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-md">ID: 12345</span>
+                        <h3 id="viewName" class="text-xl font-bold mt-1">John Doe</h3>
+                        <p id="viewCourse" class="text-sm text-slate-300">BSc Computer Science</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Academic Stats -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <p class="text-xs text-slate-500 uppercase font-medium">Year Level</p>
+                        <p id="viewYear" class="text-sm font-bold text-slate-800 mt-1">3rd Year</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <p class="text-xs text-slate-500 uppercase font-medium">Status</p>
+                        <p id="viewStatus" class="text-sm font-bold text-emerald-600 mt-1">Good Standing</p>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                        <p class="text-xs text-slate-500 uppercase font-medium">Total Units</p>
+                        <p id="viewUnits" class="text-sm font-bold text-amber-600 mt-1">18</p>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Contact Information</h4>
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 space-y-2">
+                        <div class="flex items-center space-x-3 text-sm text-slate-700">
+                            <i class="fa-solid fa-envelope text-amber-500 w-5"></i>
+                            <span id="viewEmail">jdoe@studex.edu</span>
+                        </div>
+                        <div class="flex items-center space-x-3 text-sm text-slate-700">
+                            <i class="fa-solid fa-phone text-amber-500 w-5"></i>
+                            <span id="viewPhone">555-0199</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subjects Enrolled -->
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Enrolled Subjects</h4>
+                    <div id="viewSubjectsList" class="flex flex-wrap gap-2">
+                        <!-- Chips injected dynamically -->
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
+                    <button onclick="closeViewModal()" class="px-5 py-2 text-sm font-medium text-white bg-studex-navy hover:bg-studex-navyLight rounded-xl shadow-sm transition">
+                        Close Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center space-x-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage" class="text-sm font-medium">Student saved successfully!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // StuDex Data Store
+        let students = [
+            {
+                id: "12345",
+                name: "John Doe",
+                course: "BSc Computer Science",
+                year: "3rd Year",
+                email: "jdoe@studex.edu",
+                phone: "555-0199",
+                status: "Good Standing",
+                units: 18,
+                subjects: ["CS301 - Data Structures", "CS302 - Algorithms", "CS303 - Software Eng", "GE101 - Ethics"]
+            },
+            {
+                id: "12346",
+                name: "Jane Smith",
+                course: "Information Technology",
+                year: "2nd Year",
+                email: "jsmith@studex.edu",
+                phone: "555-0188",
+                status: "Dean's List",
+                units: 21,
+                subjects: ["IT201 - Networking", "IT202 - Web Dev", "MATH201 - Statistics"]
+            },
+            {
+                id: "12347",
+                name: "Marcus Aurelius",
+                course: "Business Administration",
+                year: "4th Year",
+                email: "maurelius@studex.edu",
+                phone: "555-0144",
+                status: "Good Standing",
+                units: 15,
+                subjects: ["BUS401 - Strategic Mgt", "BUS402 - Finance", "BUS403 - Marketing"]
+            },
+            {
+                id: "12348",
+                name: "Elena Rostova",
+                course: "Data Science",
+                year: "1st Year",
+                email: "erostova@studex.edu",
+                phone: "555-0177",
+                status: "Academic Probation",
+                units: 12,
+                subjects: ["DS101 - Intro to Python", "MATH101 - Calculus"]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents(students);
+            updateStats(students);
+        });
+
+        function renderStudents(data) {
+            const tbody = document.getElementById('studentTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const resultCount = document.getElementById('resultCount');
+            
+            tbody.innerHTML = '';
+            resultCount.textContent = `Showing ${data.length} student${data.length === 1 ? '' : 's'}`;
+
+            if (data.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            } else {
+                emptyState.classList.remove('flex');
+                emptyState.classList.add('hidden');
+            }
+
+            data.forEach(student => {
+                let statusBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                if (student.status === "Dean's List") statusBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                if (student.status === "Academic Probation") statusBadgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition border-b border-slate-100 last:border-none';
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-bold text-studex-navy">${escapeHtml(student.id)}</td>
+                    <td class="py-4 px-6 font-medium text-slate-800">${escapeHtml(student.name)}</td>
+                    <td class="py-4 px-6 text-slate-600">${escapeHtml(student.course)}</td>
+                    <td class="py-4 px-6 text-slate-600">${escapeHtml(student.year)}</td>
+                    <td class="py-4 px-6">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${statusBadgeClass}">
+                            ${escapeHtml(student.status)}
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-slate-500 text-xs">
+                        <div>${escapeHtml(student.email)}</div>
+                        <div class="text-slate-400 mt-0.5">${escapeHtml(student.phone)}</div>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex items-center justify-end space-x-2">
+                            <button onclick="viewStudent('${student.id}')" title="View Profile" class="p-2 bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded-xl transition">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                            <button onclick="openEditModal('${student.id}')" title="Edit Profile" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteStudent('${student.id}')" title="Delete Profile" class="p-2 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl transition">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('statTotal').textContent = data.length;
+            const csCount = data.filter(s => s.course === 'BSc Computer Science').length;
+            document.getElementById('statCS').textContent = csCount;
+            const goodCount = data.filter(s => s.status === 'Good Standing' || s.status === "Dean's List").length;
+            document.getElementById('statGood').textContent = goodCount;
+            
+            const totalUnits = data.reduce((acc, curr) => acc + Number(curr.units), 0);
+            const avgUnits = data.length > 0 ? (totalUnits / data.length).toFixed(1) : 0;
+            document.getElementById('statUnits').textContent = avgUnits;
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const courseFilter = document.getElementById('filterCourse').value;
+            const yearFilter = document.getElementById('filterYear').value;
+
+            const filtered = students.filter(student => {
+                const matchesSearch = student.name.toLowerCase().includes(query) || student.id.toLowerCase().includes(query);
+                const matchesCourse = courseFilter === "" || student.course === courseFilter;
+                const matchesYear = yearFilter === "" || student.year === yearFilter;
+                return matchesSearch && matchesCourse && matchesYear;
+            });
+
+            renderStudents(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterCourse').value = '';
+            document.getElementById('filterYear').value = '';
+            renderStudents(students);
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('editOriginalId').value = '';
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function openEditModal(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Student Profile';
+            document.getElementById('editOriginalId').value = student.id;
+            document.getElementById('formId').value = student.id;
+            document.getElementById('formName').value = student.name;
+            document.getElementById('formCourse').value = student.course;
+            document.getElementById('formYear').value = student.year;
+            document.getElementById('formEmail').value = student.email;
+            document.getElementById('formPhone').value = student.phone;
+            document.getElementById('formStatus').value = student.status;
+            document.getElementById('formUnits').value = student.units;
+            document.getElementById('formSubjects').value = student.subjects.join(', ');
+
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('flex');
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const originalId = document.getElementById('editOriginalId').value;
+            const newId = document.getElementById('formId').value.trim();
+            const name = document.getElementById('formName').value.trim();
+            const course = document.getElementById('formCourse').value;
+            const year = document.getElementById('formYear').value;
+            const email = document.getElementById('formEmail').value.trim();
+            const phone = document.getElementById('formPhone').value.trim();
+            const status = document.getElementById('formStatus').value;
+            const units = parseInt(document.getElementById('formUnits').value, 10);
+            const subjectsRaw = document.getElementById('formSubjects').value;
+            const subjects = subjectsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+            if (originalId !== newId && students.some(s => s.id === newId)) {
+                showToast('Student ID already exists!', 'error');
+                return;
+            }
+
+            if (originalId) {
+                const index = students.findIndex(s => s.id === originalId);
+                if (index !== -1) {
+                    students[index] = { id: newId, name, course, year, email, phone, status, units, subjects };
+                    showToast('Student profile updated successfully!');
+                }
+            } else {
+                students.unshift({ id: newId, name, course, year, email, phone, status, units, subjects });
+                showToast('New student added to StuDex!');
+            }
+
+            closeModal();
+            filterStudents();
+            updateStats(students);
+        }
+
+        function deleteStudent(id) {
+            if (confirm(`Are you sure you want to delete student ${id} from StuDex?`)) {
+                students = students.filter(s => s.id !== id);
+                filterStudents();
+                updateStats(students);
+                showToast('Student record deleted.', 'error');
+            }
+        }
+
+        function viewStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('viewIdBadge').textContent = `ID: ${student.id}`;
+            document.getElementById('viewName').textContent = student.name;
+            document.getElementById('viewCourse').textContent = student.course;
+            document.getElementById('viewYear').textContent = student.year;
+            document.getElementById('viewStatus').textContent = student.status;
+            document.getElementById('viewUnits').textContent = student.units;
+            document.getElementById('viewEmail').textContent = student.email;
+            document.getElementById('viewPhone').textContent = student.phone;
+
+            const initials = student.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('viewAvatar').textContent = initials;
+
+            const subjectsContainer = document.getElementById('viewSubjectsList');
+            subjectsContainer.innerHTML = '';
+            student.subjects.forEach(sub => {
+                const chip = document.createElement('span');
+                chip.className = 'px-3 py-1 bg-amber-50 text-amber-900 text-xs font-medium rounded-lg border border-amber-200';
+                chip.textContent = sub;
+                subjectsContainer.appendChild(chip);
+            });
+
+            document.getElementById('viewModal').classList.remove('hidden');
+            document.getElementById('viewModal').classList.add('flex');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('flex');
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.textContent = message;
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-rose-400';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-amber-400';
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
