@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StuDex - Student Management & Information System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-white text-black font-sans antialiased flex flex-col">
+
+    <!-- Top Header Navigation (Black & White Monochromatic) -->
+    <header class="bg-black text-white border-b border-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Monochrome SVG Logo -->
+                <div class="bg-white p-1 rounded border border-white flex items-center justify-center">
+                    <svg class="w-6 h-6" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30 110 L95 135 L95 85 L30 60 Z" fill="#000000" />
+                        <path d="M95 135 L160 100 L160 50 L95 85 Z" fill="#555555" />
+                        <path d="M40 50 C 65 50, 85 62, 95 72 C 105 62, 125 50, 150 50 L 160 100 C 135 100, 105 118, 95 135 C 85 118, 55 100, 30 100 Z" fill="none" stroke="#000000" stroke-width="12" stroke-linejoin="round" />
+                        <rect x="98" y="45" width="10" height="35" fill="#888888"/>
+                        <rect x="114" y="32" width="10" height="48" fill="#000000"/>
+                        <rect x="130" y="22" width="10" height="58" fill="#888888"/>
+                        <path d="M60 105 C 80 85, 110 50, 160 25" stroke="#000000" stroke-width="10"/>
+                    </svg>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="text-lg font-bold text-white tracking-wide">StuDex</h1>
+                    <span class="text-xs text-gray-400 border-l border-gray-700 pl-2">Student Information System</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openAddModal()" class="bg-white hover:bg-gray-200 text-black font-semibold text-xs px-3 py-1.5 rounded border border-black transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Add Student</span>
+                </button>
+                <div class="text-xs text-gray-400 border-l border-gray-800 pl-3 hidden sm:block">
+                    Logged in as: <strong class="text-white">Administrator</strong>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4">
+
+        <!-- Metrics / Summary Row (Monochrome Blocks) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded border border-black">
+                <p class="text-xs font-semibold text-gray-600 uppercase">Total Enrolled</p>
+                <p id="statTotal" class="text-xl font-bold text-black mt-1">0</p>
+            </div>
+            <div class="bg-white p-4 rounded border border-black">
+                <p class="text-xs font-semibold text-gray-600 uppercase">Computer Science</p>
+                <p id="statCS" class="text-xl font-bold text-black mt-1">0</p>
+            </div>
+            <div class="bg-white p-4 rounded border border-black">
+                <p class="text-xs font-semibold text-gray-600 uppercase">Good Standing</p>
+                <p id="statGood" class="text-xl font-bold text-black mt-1">0</p>
+            </div>
+            <div class="bg-white p-4 rounded border border-black">
+                <p class="text-xs font-semibold text-gray-600 uppercase">Average Units</p>
+                <p id="statUnits" class="text-xl font-bold text-black mt-1">0</p>
+            </div>
+        </div>
+
+        <!-- Search and Filter Controls -->
+        <div class="bg-white p-3.5 rounded border border-black flex flex-col sm:flex-row gap-3 items-center justify-between">
+            <div class="w-full sm:w-80 relative">
+                <input type="text" id="searchInput" oninput="filterStudents()" placeholder="Search by Student ID or Name..." class="w-full px-3 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+            </div>
+            
+            <div class="w-full sm:w-auto flex flex-wrap gap-2 items-center">
+                <select id="filterCourse" onchange="filterStudents()" class="px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    <option value="">All Courses</option>
+                    <option value="BSc Computer Science">BSc Computer Science</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Business Administration">Business Administration</option>
+                    <option value="Data Science">Data Science</option>
+                </select>
+
+                <select id="filterYear" onchange="filterStudents()" class="px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    <option value="">All Year Levels</option>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                </select>
+
+                <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-black bg-white hover:bg-gray-100 rounded border border-black">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Data Table -->
+        <div class="bg-white rounded border border-black overflow-hidden flex-1 flex flex-col">
+            <div class="px-4 py-2.5 border-b border-black bg-gray-100 flex items-center justify-between">
+                <h2 class="font-bold text-xs text-black uppercase tracking-wider">Student Records</h2>
+                <span id="resultCount" class="text-xs font-medium text-black">Showing 0 students</span>
+            </div>
+
+            <div class="overflow-x-auto flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-200 text-black text-xs font-bold border-b border-black">
+                            <th class="py-2.5 px-4">Student ID</th>
+                            <th class="py-2.5 px-4">Name</th>
+                            <th class="py-2.5 px-4">Course</th>
+                            <th class="py-2.5 px-4">Year</th>
+                            <th class="py-2.5 px-4">Academic Status</th>
+                            <th class="py-2.5 px-4">Contact Info</th>
+                            <th class="py-2.5 px-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="divide-y divide-gray-300 text-sm text-black">
+                        <!-- Dynamic rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-12 px-4 text-center">
+                <p class="text-sm text-black">No matching student records found.</p>
+                <button onclick="openAddModal()" class="mt-2 text-xs bg-black text-white px-3 py-1.5 rounded hover:bg-gray-800">
+                    Add New Student
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="studentModal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
+        <div class="bg-white rounded shadow-lg max-w-lg w-full overflow-hidden border border-black">
+            <div class="px-4 py-3 bg-black text-white flex items-center justify-between">
+                <h3 id="modalTitle" class="font-bold text-sm">Add New Student</h3>
+                <button onclick="closeModal()" class="text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="studentForm" onsubmit="handleFormSubmit(event)" class="p-4 space-y-3">
+                <input type="hidden" id="editOriginalId">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Student ID *</label>
+                        <input type="text" id="formId" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Full Name *</label>
+                        <input type="text" id="formName" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Course *</label>
+                        <select id="formCourse" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                            <option value="">Select Course</option>
+                            <option value="BSc Computer Science">BSc Computer Science</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Business Administration">Business Administration</option>
+                            <option value="Data Science">Data Science</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Year Level *</label>
+                        <select id="formYear" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                            <option value="">Select Year</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Email *</label>
+                        <input type="email" id="formEmail" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Phone *</label>
+                        <input type="text" id="formPhone" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">Academic Status *</label>
+                        <select id="formStatus" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                            <option value="Good Standing">Good Standing</option>
+                            <option value="Dean's List">Dean's List</option>
+                            <option value="Academic Probation">Academic Probation</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-black mb-1">No. of Units *</label>
+                        <input type="number" id="formUnits" min="1" max="30" required value="18" class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-black mb-1">Enrolled Subjects (comma separated) *</label>
+                    <input type="text" id="formSubjects" required class="w-full px-2.5 py-1.5 bg-white border border-black rounded text-sm focus:outline-none focus:ring-1 focus:ring-black">
+                </div>
+
+                <div class="pt-3 border-t border-black flex items-center justify-end space-x-2">
+                    <button type="button" onclick="closeModal()" class="px-3 py-1.5 text-xs text-black bg-white hover:bg-gray-100 rounded border border-black">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-semibold text-white bg-black hover:bg-gray-800 rounded">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Profile Details Modal -->
+    <div id="viewModal" class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
+        <div class="bg-white rounded shadow-lg max-w-lg w-full overflow-hidden border border-black">
+            <div class="bg-black text-white px-4 py-3 flex items-center justify-between">
+                <h3 class="font-bold text-sm">Student Profile Details</h3>
+                <button onclick="closeViewModal()" class="text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-4 text-sm">
+                <div class="border-b border-black pb-3 flex justify-between items-start">
+                    <div>
+                        <h3 id="viewName" class="text-base font-bold text-black">John Doe</h3>
+                        <p id="viewCourse" class="text-xs text-gray-700">BSc Computer Science</p>
+                    </div>
+                    <span id="viewIdBadge" class="text-xs font-mono font-bold bg-white border border-black px-2 py-0.5 rounded">ID: 12345</span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="bg-white p-2 rounded border border-black">
+                        <span class="text-gray-600 block">Year</span>
+                        <strong id="viewYear" class="text-black">3rd Year</strong>
+                    </div>
+                    <div class="bg-white p-2 rounded border border-black">
+                        <span class="text-gray-600 block">Status</span>
+                        <strong id="viewStatus" class="text-black">Good Standing</strong>
+                    </div>
+                    <div class="bg-white p-2 rounded border border-black">
+                        <span class="text-gray-600 block">Units</span>
+                        <strong id="viewUnits" class="text-black">18</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase block mb-1">Contact Details</span>
+                    <div class="text-xs text-black space-y-1 bg-white p-2.5 rounded border border-black">
+                        <p><strong>Email:</strong> <span id="viewEmail">jdoe@studex.edu</span></p>
+                        <p><strong>Phone:</strong> <span id="viewPhone">555-0199</span></p>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs font-semibold text-gray-600 uppercase block mb-1">Subjects Enrolled</span>
+                    <div id="viewSubjectsList" class="flex flex-wrap gap-1">
+                        <!-- Chips injected dynamically -->
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-black flex justify-end">
+                    <button onclick="closeViewModal()" class="px-3 py-1.5 text-xs text-white bg-black rounded hover:bg-gray-800">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 z-50 transform translate-y-20 opacity-0 transition-all duration-200 bg-black text-white px-3 py-2 rounded text-xs flex items-center space-x-2 border border-white">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-white"></i>
+        <span id="toastMessage">Student saved successfully!</span>
+    </div>
+
+    <script>
+        // ... existing JavaScript logic remains identical ...
+        let students = [
+            {
+                id: "12345",
+                name: "John Doe",
+                course: "BSc Computer Science",
+                year: "3rd Year",
+                email: "jdoe@studex.edu",
+                phone: "555-0199",
+                status: "Good Standing",
+                units: 18,
+                subjects: ["CS301 - Data Structures", "CS302 - Algorithms", "CS303 - Software Eng", "GE101 - Ethics"]
+            },
+            {
+                id: "12346",
+                name: "Jane Smith",
+                course: "Information Technology",
+                year: "2nd Year",
+                email: "jsmith@studex.edu",
+                phone: "555-0188",
+                status: "Dean's List",
+                units: 21,
+                subjects: ["IT201 - Networking", "IT202 - Web Dev", "MATH201 - Statistics"]
+            },
+            {
+                id: "12347",
+                name: "Marcus Aurelius",
+                course: "Business Administration",
+                year: "4th Year",
+                email: "maurelius@studex.edu",
+                phone: "555-0144",
+                status: "Good Standing",
+                units: 15,
+                subjects: ["BUS401 - Strategic Mgt", "BUS402 - Finance", "BUS403 - Marketing"]
+            },
+            {
+                id: "12348",
+                name: "Elena Rostova",
+                course: "Data Science",
+                year: "1st Year",
+                email: "erostova@studex.edu",
+                phone: "555-0177",
+                status: "Academic Probation",
+                units: 12,
+                subjects: ["DS101 - Intro to Python", "MATH101 - Calculus"]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents(students);
+            updateStats(students);
+        });
+
+        function renderStudents(data) {
+            const tbody = document.getElementById('studentTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const resultCount = document.getElementById('resultCount');
+            
+            tbody.innerHTML = '';
+            resultCount.textContent = `Showing ${data.length} student${data.length === 1 ? '' : 's'}`;
+
+            if (data.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            } else {
+                emptyState.classList.remove('flex');
+                emptyState.classList.add('hidden');
+            }
+
+            data.forEach(student => {
+                let statusBadgeClass = 'bg-white border border-black text-black';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-100 border-b border-black';
+                tr.innerHTML = `
+                    <td class="py-2.5 px-4 font-mono font-bold text-black">${escapeHtml(student.id)}</td>
+                    <td class="py-2.5 px-4 font-medium text-black">${escapeHtml(student.name)}</td>
+                    <td class="py-2.5 px-4 text-black">${escapeHtml(student.course)}</td>
+                    <td class="py-2.5 px-4 text-black">${escapeHtml(student.year)}</td>
+                    <td class="py-2.5 px-4">
+                        <span class="inline-block px-2 py-0.5 text-xs rounded font-semibold ${statusBadgeClass}">
+                            ${escapeHtml(student.status)}
+                        </span>
+                    </td>
+                    <td class="py-2.5 px-4 text-black text-xs">
+                        <div>${escapeHtml(student.email)}</div>
+                        <div class="text-gray-600">${escapeHtml(student.phone)}</div>
+                    </td>
+                    <td class="py-2.5 px-4 text-right">
+                        <div class="flex items-center justify-end space-x-1.5">
+                            <button onclick="viewStudent('${student.id}')" title="View" class="p-1 text-black hover:underline">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                            <button onclick="openEditModal('${student.id}')" title="Edit" class="p-1 text-black hover:underline">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteStudent('${student.id}')" title="Delete" class="p-1 text-black hover:underline">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('statTotal').textContent = data.length;
+            const csCount = data.filter(s => s.course === 'BSc Computer Science').length;
+            document.getElementById('statCS').textContent = csCount;
+            const goodCount = data.filter(s => s.status === 'Good Standing' || s.status === "Dean's List").length;
+            document.getElementById('statGood').textContent = goodCount;
+            
+            const totalUnits = data.reduce((acc, curr) => acc + Number(curr.units), 0);
+            const avgUnits = data.length > 0 ? (totalUnits / data.length).toFixed(1) : 0;
+            document.getElementById('statUnits').textContent = avgUnits;
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const courseFilter = document.getElementById('filterCourse').value;
+            const yearFilter = document.getElementById('filterYear').value;
+
+            const filtered = students.filter(student => {
+                const matchesSearch = student.name.toLowerCase().includes(query) || student.id.toLowerCase().includes(query);
+                const matchesCourse = courseFilter === "" || student.course === courseFilter;
+                const matchesYear = yearFilter === "" || student.year === yearFilter;
+                return matchesSearch && matchesCourse && matchesYear;
+            });
+
+            renderStudents(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterCourse').value = '';
+            document.getElementById('filterYear').value = '';
+            renderStudents(students);
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Student';
+            document.getElementById('studentForm').reset();
+            document.getElementById('editOriginalId').value = '';
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function openEditModal(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Student Profile';
+            document.getElementById('editOriginalId').value = student.id;
+            document.getElementById('formId').value = student.id;
+            document.getElementById('formName').value = student.name;
+            document.getElementById('formCourse').value = student.course;
+            document.getElementById('formYear').value = student.year;
+            document.getElementById('formEmail').value = student.email;
+            document.getElementById('formPhone').value = student.phone;
+            document.getElementById('formStatus').value = student.status;
+            document.getElementById('formUnits').value = student.units;
+            document.getElementById('formSubjects').value = student.subjects.join(', ');
+
+            document.getElementById('studentModal').classList.remove('hidden');
+            document.getElementById('studentModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('studentModal').classList.remove('flex');
+            document.getElementById('studentModal').classList.add('hidden');
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const originalId = document.getElementById('editOriginalId').value;
+            const newId = document.getElementById('formId').value.trim();
+            const name = document.getElementById('formName').value.trim();
+            const course = document.getElementById('formCourse').value;
+            const year = document.getElementById('formYear').value;
+            const email = document.getElementById('formEmail').value.trim();
+            const phone = document.getElementById('formPhone').value.trim();
+            const status = document.getElementById('formStatus').value;
+            const units = parseInt(document.getElementById('formUnits').value, 10);
+            const subjectsRaw = document.getElementById('formSubjects').value;
+            const subjects = subjectsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+            if (originalId !== newId && students.some(s => s.id === newId)) {
+                showToast('Student ID already exists!', 'error');
+                return;
+            }
+
+            if (originalId) {
+                const index = students.findIndex(s => s.id === originalId);
+                if (index !== -1) {
+                    students[index] = { id: newId, name, course, year, email, phone, status, units, subjects };
+                    showToast('Student profile updated.');
+                }
+            } else {
+                students.unshift({ id: newId, name, course, year, email, phone, status, units, subjects });
+                showToast('Student added successfully.');
+            }
+
+            closeModal();
+            filterStudents();
+            updateStats(students);
+        }
+
+        function deleteStudent(id) {
+            if (confirm(`Delete student record ${id}?`)) {
+                students = students.filter(s => s.id !== id);
+                filterStudents();
+                updateStats(students);
+                showToast('Student record deleted.', 'error');
+            }
+        }
+
+        function viewStudent(id) {
+            const student = students.find(s => s.id === id);
+            if (!student) return;
+
+            document.getElementById('viewIdBadge').textContent = `ID: ${student.id}`;
+            document.getElementById('viewName').textContent = student.name;
+            document.getElementById('viewCourse').textContent = student.course;
+            document.getElementById('viewYear').textContent = student.year;
+            document.getElementById('viewStatus').textContent = student.status;
+            document.getElementById('viewUnits').textContent = student.units;
+            document.getElementById('viewEmail').textContent = student.email;
+            document.getElementById('viewPhone').textContent = student.phone;
+
+            const subjectsContainer = document.getElementById('viewSubjectsList');
+            subjectsContainer.innerHTML = '';
+            student.subjects.forEach(sub => {
+                const chip = document.createElement('span');
+                chip.className = 'px-2 py-0.5 bg-white text-black text-xs rounded border border-black';
+                chip.textContent = sub;
+                subjectsContainer.appendChild(chip);
+            });
+
+            document.getElementById('viewModal').classList.remove('hidden');
+            document.getElementById('viewModal').classList.add('flex');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewModal').classList.remove('flex');
+            document.getElementById('viewModal').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.textContent = message;
+            if (type === 'error') {
+                toastIcon.className = 'fa-solid fa-circle-exclamation text-white';
+            } else {
+                toastIcon.className = 'fa-solid fa-circle-check text-white';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
